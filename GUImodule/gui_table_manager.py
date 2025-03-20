@@ -1,4 +1,3 @@
-# GUImodule/gui_table_manager.py
 from PyQt5.QtWidgets import QTableWidgetItem
 import pandas as pd
 from module.save_results import load_scores

@@ -1,4 +1,3 @@
-# GUImodule/gui_auto_refresh.py
 from PyQt5.QtCore import QTimer
 
 class AutoRefresh:

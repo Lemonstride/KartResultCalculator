@@ -1,4 +1,3 @@
-# GUImodule/gui_button_manager.py
 from PyQt5.QtWidgets import QPushButton, QVBoxLayout, QMessageBox
 from module.save_results import clear_scores, save_to_csv, load_scores
 from GUImodule import screenshot_manager, gui_table_manager
