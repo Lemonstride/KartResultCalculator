@@ -27,3 +27,18 @@ def save_to_csv(processed_pairs, csv_path):
     result_df = pd.DataFrame(ranking, columns=["排名", "玩家", "本次得分", "累计积分"])
     result_df.to_csv(csv_path, index=False, encoding="utf-8-sig")
     print(f"✅ 已保存积分到 {csv_path}")
+
+def clear_scores(result_csv='./results/results.csv'):
+    if os.path.exists(result_csv):
+        os.remove(result_csv)
+
+def load_scores(result_csv='./results/results.csv'):
+    """
+    读取已有积分 CSV，如果不存在则返回空 DataFrame
+    """
+    if os.path.exists(result_csv):
+        df = pd.read_csv(result_csv)
+        return df
+    else:
+        # 返回结构标准的空 DataFrame，避免下游报错
+        return pd.DataFrame(columns=["排名", "玩家", "本次得分", "累计积分"])
