@@ -1,11 +1,21 @@
 import cv2
 
-def preprocess_image(image_path, save_path):
-    image = cv2.imread(image_path)
-    # 使用CLAHE增强对比度（避免过曝）
+def preprocess_image(image):
+    """
+    图像预处理（CLAHE增强 + 高斯降噪），传cv2图像进来，返回处理后图
+    """
+    if image is None:
+        print("[❌ 预处理失败，图像为空]")
+        return None
+
+    # 灰度
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
+
+    # CLAHE增强
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
     enhanced = clahe.apply(gray)
-    # 轻量高斯模糊去噪
-    blurred = cv2.GaussianBlur(enhanced, (3,3), 0)
-    cv2.imwrite(save_path, blurred)
+
+    # 高斯模糊降噪
+    blurred = cv2.GaussianBlur(enhanced, (3, 3), sigmaX=0)
+
+    return blurred

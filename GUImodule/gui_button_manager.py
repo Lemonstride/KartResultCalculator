@@ -1,38 +1,40 @@
-from PyQt5.QtWidgets import QPushButton, QVBoxLayout, QMessageBox
-from module.save_results import clear_scores, save_to_csv, load_scores
-from GUImodule import screenshot_manager, gui_table_manager
-from module.crop import crop_image
-from module.preprocess import preprocess_image
-from module.ocr_processing import ocr_and_process
+# GUImodule/gui_button_manager.py
+from PyQt5.QtWidgets import QPushButton, QMessageBox
+from module.score_calculator import clear_scores
+from GUImodule.gui_folder_selector import select_screenshot_folder
 
 class ButtonManager:
     def __init__(self, main_window):
-        self.main = main_window
-        self.layout = QVBoxLayout()
+        self.main_window = main_window
+        self.setup_buttons()
 
-        self.update_btn = QPushButton("手动更新")
-        self.update_btn.clicked.connect(self.update_score)
-        self.layout.addWidget(self.update_btn)
+    def setup_buttons(self):
+        self.update_button = QPushButton("手动更新")
+        self.update_button.clicked.connect(self.main_window.manual_update)
 
-        self.clear_btn = QPushButton("清空积分")
-        self.clear_btn.clicked.connect(self.clear_scores)
-        self.layout.addWidget(self.clear_btn)
+        self.clear_button = QPushButton("清空积分")
+        self.clear_button.clicked.connect(self.clear_score_action)
 
-    def update_score(self):
-        latest_img = screenshot_manager.get_latest_screenshot('./ScreenShots/')
-        if not latest_img:
-            QMessageBox.warning(self.main, "错误", "未找到截图")
-            return
+        self.select_folder_button = QPushButton("绑定截图路径")
+        self.select_folder_button.clicked.connect(self.select_folder_action)
 
-        crop_image(latest_img, './ScreenShots/cropped.png')
-        preprocess_image('./ScreenShots/cropped.png', './ScreenShots/preprocessed.png')
-        pairs = ocr_and_process('./ScreenShots/preprocessed.png')
-        save_to_csv(pairs, './results/results.csv')
+        self.main_window.layout.addWidget(self.update_button)
+        self.main_window.layout.addWidget(self.clear_button)
+        self.main_window.layout.addWidget(self.select_folder_button)
 
-        self.main.table_manager.load_scores()
+    def clear_score_action(self):
+        reply = QMessageBox.question(
+            self.main_window,
+            "清空确认",
+            "确定要清空所有积分吗？",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+        if reply == QMessageBox.Yes:
+            clear_scores()
+            self.main_window.refresh_table()
 
-    def clear_scores(self):
-        clear_scores('./results/results.csv')
-        self.main.table.clear()
-        self.main.table.setRowCount(0)
-        QMessageBox.information(self.main, "已清空", "积分已清空")
+    def select_folder_action(self):
+        folder = select_screenshot_folder(self.main_window)
+        if folder:
+            self.main_window.screenshot_folder = folder
